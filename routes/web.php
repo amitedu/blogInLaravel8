@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\Category;
 use App\Models\Post;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,9 +17,21 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('posts', ['posts' => Post::all()]);
+    return view('posts', ['posts' => Post::latest()->with('category', 'author')->get()]);
 });
 
-Route::get('/posts/{post}', function ($slug) {
-    return view('post', ['post' => Post::findOrFail($slug)]);
+Route::get('/posts/{post:slug}', function (Post $post) {
+    return view('post', ['post' => $post]);
+});
+
+Route::get('/categories/{category:slug}', function (Category $category) {
+//    Eager loading can be this way
+//    return view('posts', ['posts' => $category->posts->load(['category', 'author'])]);
+    return view('posts', ['posts' => $category->posts]);
+});
+
+Route::get('/author/{author:username}', function (User $author) {
+//    Eager loading can be this way or mention in the model
+//    return view('posts', ['posts' => $author->posts->load(['category', 'author'])]);
+    return view('posts', ['posts' => $author->posts]);
 });
