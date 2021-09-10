@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PostController;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\User;
@@ -16,22 +17,25 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('posts', ['posts' => Post::latest()->with('category', 'author')->get()]);
-});
+Route::get('/', [PostController::class, 'index'])->name('home');
 
-Route::get('/posts/{post:slug}', function (Post $post) {
-    return view('post', ['post' => $post]);
-});
+Route::get('/posts/{post:slug}', [PostController::class, 'show']);
 
-Route::get('/categories/{category:slug}', function (Category $category) {
-//    Eager loading can be this way
-//    return view('posts', ['posts' => $category->posts->load(['category', 'author'])]);
-    return view('posts', ['posts' => $category->posts]);
-});
+//Route::get('/categories/{category:slug}', function (Category $category) {
+////    Eager loading can be this way
+////    return view('posts', ['posts' => $category->posts->load(['category', 'author'])]);
+//    return view('posts', [
+//        'posts' => $category->posts,
+//        'currentCategory' => $category,
+//        'categories' => Category::all()
+//    ]);
+//})->name('categories');
 
 Route::get('/author/{author:username}', function (User $author) {
 //    Eager loading can be this way or mention in the model
 //    return view('posts', ['posts' => $author->posts->load(['category', 'author'])]);
-    return view('posts', ['posts' => $author->posts]);
+    return view('posts', [
+        'posts' => $author->posts,
+        'categories' => Category::all()
+    ]);
 });
